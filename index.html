@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OUSHAM - Official Store</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 antialiased" x-data="storeData()">
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-50 bg-zinc-900/80 backdrop-blur-md border-b border-zinc-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <a href="#" class="text-2xl font-black tracking-wider text-white">OUSHAM<span class="text-amber-500">.</span></a>
+            <nav class="hidden md:flex space-x-8 space-x-reverse text-sm font-medium text-zinc-300">
+                <a href="#" class="hover:text-white transition">الرئيسية</a>
+                <a href="#products" class="hover:text-white transition">التشكيلة</a>
+                <a href="#about" class="hover:text-white transition">من نحن</a>
+            </nav>
+            <div class="flex items-center space-x-4 space-x-reverse">
+                <button @click="cartOpen = !cartOpen" class="relative bg-zinc-800 hover:bg-zinc-700 p-2.5 rounded-full transition flex items-center justify-center">
+                    <svg class="w-6 h-6 text-zinc-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                    <span class="absolute -top-1 -right-1 bg-amber-500 text-zinc-950 text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center" x-text="cartCount"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative bg-zinc-900 py-24 lg:py-32 border-b border-zinc-800 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <span class="bg-amber-500/10 text-amber-400 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-amber-500/20">شتاء 2026 / Streetwear</span>
+            <h1 class="mt-4 text-4xl sm:text-6xl font-black tracking-tight text-white">اصنع هويتك مع هوديز <span class="text-amber-500">OUSHAM</span></h1>
+            <p class="mt-6 max-w-2xl mx-auto text-lg text-zinc-400">تصاميم عصريّة، أقمشة ثقيلة فاخرة، وراحة مطلقة صُممت خصيصاً لتناسب أسلوب حياتك.</p>
+            <div class="mt-10">
+                <a href="#products" class="bg-white text-zinc-950 font-bold px-8 py-4 rounded-full hover:bg-zinc-200 transition shadow-lg">اكتشف التشكيلة</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Grid -->
+    <main id="products" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <h2 class="text-2xl font-bold mb-8 border-r-4 border-amber-500 pr-4">أحدث الإصدارات</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {% for product in products %}
+            <div class="bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800 flex flex-col group">
+                <div class="relative overflow-hidden aspect-square bg-zinc-800">
+                    <img src="{{ product.image }}" alt="{{ product.name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    <span class="absolute top-3 right-3 bg-zinc-900/80 backdrop-blur-md text-zinc-200 text-xs font-semibold px-2.5 py-1 rounded-md border border-zinc-700">{{ product.tag }}</span>
+                </div>
+                <div class="p-5 flex flex-col flex-grow justify-between">
+                    <div>
+                        <h3 class="font-bold text-lg text-white">{{ product.name }}</h3>
+                        <p class="mt-2 text-amber-400 font-bold text-xl">{{ product.price }} د.م</p>
+                    </div>
+                    <button @click="addToCart('{{ product.name }}', {{ product.price }}, '{{ product.image }}')" class="mt-6 w-full bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold py-3 rounded-xl transition">
+                        أضف إلى السلة
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <!-- Cart Drawer Modal -->
+    <div x-show="cartOpen" class="fixed inset-0 z-50 overflow-hidden" style="display: none;">
+        <div @click="cartOpen = false" class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"></div>
+        <div class="absolute inset-y-0 left-0 max-w-full flex pl-10">
+            <div class="w-screen max-w-md bg-zinc-900 border-r border-zinc-800 flex flex-col shadow-2xl">
+                <div class="p-6 flex items-center justify-between border-b border-zinc-800">
+                    <h2 class="text-xl font-bold text-white">سلة المشتريات</h2>
+                    <button @click="cartOpen = false" class="text-zinc-400 hover:text-white text-2xl font-bold">&times;</button>
+                </div>
+                <div class="p-6 flex-grow overflow-y-auto space-y-4">
+                    <template x-if="cart.length === 0">
+                        <p class="text-center text-zinc-500 py-12">سلة المشتريات فارغة حالياً.</p>
+                    </template>
+                    <template x-for="(item, index) in cart" :key="index">
+                        <div class="flex items-center justify-between bg-zinc-800/50 p-4 rounded-xl border border-zinc-800">
+                            <div class="flex items-center space-x-3 space-x-reverse">
+                                <img :src="item.image" class="w-16 h-16 object-cover rounded-lg">
+                                <div>
+                                    <h4 class="font-semibold text-sm text-white" x-text="item.name"></h4>
+                                    <p class="text-amber-400 text-sm mt-1" x-text="item.price + ' د.م'"></p>
+                                </div>
+                            </div>
+                            <button @click="removeFromCart(index)" class="text-red-400 hover:text-red-300 text-sm">حذف</button>
+                        </div>
+                    </template>
+                </div>
+                <div class="p-6 border-t border-zinc-800 bg-zinc-950">
+                    <div class="flex justify-between mb-4 font-bold text-lg">
+                        <span>الإجمالي:</span>
+                        <span class="text-amber-400" x-text="cartTotal + ' د.م'"></span>
+                    </div>
+                    <button @click="checkout()" class="w-full bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold py-4 rounded-xl transition">
+                        إتمام الطلب (الدفع عند الاستلام)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-zinc-900 border-t border-zinc-800 py-12 mt-20 text-center text-zinc-500 text-sm">
+        <p>&copy; 2026 OUSHAM. جميع الحقوق محفوظة.</p>
+    </footer>
+
+    <!-- Alpine Store Logic -->
+    <script>
+        function storeData() {
+            return {
+                cartOpen: false,
+                cart: [],
+                get cartCount() {
+                    return this.cart.length;
+                },
+                get cartTotal() {
+                    return this.cart.reduce((sum, item) => sum + item.price, 0);
+                },
+                addToCart(name, price, image) {
+                    this.cart.push({ name, price, image });
+                    this.cartOpen = true;
+                },
+                removeFromCart(index) {
+                    this.cart.splice(index, 1);
+                },
+                checkout() {
+                    if(this.cart.length === 0) {
+                        alert('سلتك فارغة!');
+                        return;
+                    }
+                    fetch('/checkout', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ items: this.cart, total: this.cartTotal })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        alert(data.message);
+                        this.cart = [];
+                        this.cartOpen = false;
+                    });
+                }
+            }
+        }
+    </script>
+</body>
+</html>
