@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
-# قائمة منتجات الهوديز الأولية لمتجر OUSHAM
+# قائمة منتجات الهوديز لمتجر OUSHAM
 products = [
     {
         "id": 1,
@@ -41,11 +41,10 @@ def home():
 @app.route('/checkout', methods=['POST'])
 def checkout():
     data = request.json
-    # هنا يمكنك معالجة الطلب وحفظه في قاعدة البيانات محلياً
     cart_items = data.get('items', [])
     total_price = data.get('total', 0)
     print(f"تم استلام طلب جديد! المنتجات: {cart_items}, الإجمالي: {total_price} درهم")
     return jsonify({"status": "success", "message": "تم تأكيد طلبك بنجاح وسنتواصل معك قريباً!"})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(host='0.0.0.0', port=7860)
